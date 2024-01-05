@@ -154,23 +154,28 @@ def delete_word_from_dict(uid, word_e):
 def delete_specific_word(e_r_word_id, e_word_id, r_word_id):
     with psycopg2.connect(database="Telegram_English", user="postgres", password="postgres") as conn:
         with conn.cursor() as cur:
-            cur.execute("""
-                delete from user_words
-                where custom_word_id = %s
-                """, (e_r_word_id,))
-            cur.execute("""
-                delete from e_r_words
-                where id = %s
-                """, (e_r_word_id,))
-            cur.execute("""
-                delete from e_words
-                where id = %s
-                """, (e_word_id,))
-            cur.execute("""
-                delete from r_words
-                where id = %s
-                """, (r_word_id,))
-            conn.commit()
+            try:
+                cur.execute("""
+                    delete from user_words
+                    where custom_word_id = %s
+                    """, (e_r_word_id,))
+                cur.execute("""
+                    delete from e_r_words
+                    where id = %s
+                    """, (e_r_word_id,))
+                cur.execute("""
+                    delete from e_words
+                    where id = %s
+                    """, (e_word_id,))
+                cur.execute("""
+                    delete from r_words
+                    where id = %s
+                    """, (r_word_id,))
+                conn.commit()
+            except Exception as ex:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                print(message)
 
 
 def if_e_word_exists(uid, word):
