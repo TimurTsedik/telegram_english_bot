@@ -58,6 +58,35 @@ def get_user_step(uid):
 
 @bot.message_handler(commands=['cards', 'start'])
 def create_cards(message):
+    """
+    Function Purpose:
+
+    This function is a handler for the /cards and /start commands. It initializes or continues the process of creating
+    English-Russian vocabulary cards for language learning in a Telegram bot.
+
+    Parameters:
+
+    message: The message object received from the user.
+    Function Flow:
+
+    Check User Existence:
+    Checks if the user already exists in the system. If not, adds the user to the database.
+    Initializes user-specific variables (userStep, etc.).
+    Create Reply Markup:
+    Initializes a reply keyboard markup with buttons for vocabulary card interaction.
+    Retrieves a random English word (target_word) and its translation (translate) from the database.
+    Generates additional words (others) for the multiple-choice options.
+    Shuffle Buttons:
+    Shuffles the order of buttons to present the options randomly.
+    Send Message with Markup:
+    Sends a message to the user with the translated word and multiple-choice options.
+    Sets the user's state to track the ongoing conversation.
+    Store Data in Bot's Memory:
+    Stores essential data in the bot's memory for tracking user progress.
+    Reply Keyboard Layout:
+
+    The keyboard layout includes buttons for each word option, a "Next" button, an "Add Word" button, and a "Delete Word" button.
+    """
     cid = message.chat.id
     if if_user_not_exist(cid):
         known_users.append(cid)
@@ -128,6 +157,39 @@ def add_word(message):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def message_reply(message):
+    """
+    Function Purpose:
+
+    This function is a message handler for processing user text messages in a Telegram bot. It handles various states
+    and actions based on user input.
+
+    Parameters:
+
+    message: The message object received from the user.
+    Function Flow:
+
+    Initialize Variables:
+    Initializes necessary variables and reply markup for message handling.
+    Check User State:
+    Determines the user's current state (userStep) to understand the context of the message.
+    Handling State 0 (Answering Vocabulary Card):
+    Checks if the provided text matches the target word.
+    Provides feedback and a hint based on the correctness of the answer.
+    Handling State 1 (Adding English Word):
+    Stores the provided text as the English word to be added.
+    Advances the user to the next state.
+    Handling State 2 (Adding Russian Translation):
+    Stores the provided text as the Russian translation.
+    Adds the word to the user's dictionary and provides feedback.
+    Checks for duplicate entries in the dictionary.
+    Handling State 3 (Deleting Word):
+    Deletes the provided word from the user's dictionary.
+    Provides feedback based on the success or failure of the deletion.
+    Send Response Message:
+    Sends a response message to the user with the appropriate hint and feedback.
+    Invokes the next_cards function if the answer was correct.
+
+    """
     sucsess = False
     text = message.text
     markup = types.ReplyKeyboardMarkup(row_width=2)
